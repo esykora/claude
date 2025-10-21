@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentCore Bootcamp Prep</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <h1>AgentCore Bootcamp Prep</h1>
+                <p class="subtitle">Prepare for AWS re:Invent AgentCore Bootcamp</p>
+            </div>
+            <div class="sync-controls">
+                <button id="syncBtn" class="btn-secondary">
+                    <span id="syncStatus">Sync with GitHub</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-btn" data-tab="modules">Modules</button>
+            <button class="tab-btn" data-tab="assessment">Assessments</button>
+            <button class="tab-btn" data-tab="resources">Resources</button>
+        </nav>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <!-- Readiness Score Card -->
+                <div class="card readiness-card">
+                    <h2>Readiness Score</h2>
+                    <div class="readiness-meter">
+                        <svg class="progress-ring" width="200" height="200">
+                            <circle class="progress-ring-circle-bg" stroke="#1a1a1a" stroke-width="12" fill="transparent" r="90" cx="100" cy="100"/>
+                            <circle id="readinessCircle" class="progress-ring-circle" stroke="url(#gradient)" stroke-width="12" fill="transparent" r="90" cx="100" cy="100"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#00ff9f;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#00b8ff;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="readiness-score">
+                            <span id="readinessScore">0</span>
+                            <span class="score-percent">%</span>
+                        </div>
+                    </div>
+                    <p id="readinessMessage" class="readiness-message">Start learning to build your readiness score</p>
+                    <div class="bootcamp-countdown">
+                        <p class="countdown-label">Bootcamp starts in:</p>
+                        <div id="countdown" class="countdown-display">
+                            <div class="countdown-item">
+                                <span id="days">--</span>
+                                <span class="countdown-unit">days</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span id="hours">--</span>
+                                <span class="countdown-unit">hours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Overview -->
+                <div class="card progress-card">
+                    <h2>Learning Progress</h2>
+                    <div class="progress-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="completedModules">0</span>
+                            <span class="stat-label">Modules Completed</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="completedLessons">0</span>
+                            <span class="stat-label">Lessons Completed</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="estimatedHours">45</span>
+                            <span class="stat-label">Total Hours</span>
+                        </div>
+                    </div>
+                    <div class="progress-breakdown">
+                        <h3>Module Completion</h3>
+                        <div id="moduleProgressList" class="module-progress-list"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card actions-card">
+                    <h2>Quick Actions</h2>
+                    <div class="action-buttons">
+                        <button class="btn-primary" id="continueBtn">Continue Learning</button>
+                        <button class="btn-secondary" id="takeAssessmentBtn">Take Assessment</button>
+                        <button class="btn-secondary" id="viewResourcesBtn">Browse Resources</button>
+                        <button class="btn-secondary" id="exportProgressBtn">Export Progress</button>
+                    </div>
+                </div>
+
+                <!-- Recommended Focus -->
+                <div class="card focus-card">
+                    <h2>Recommended Focus</h2>
+                    <div id="recommendedFocus" class="focus-content">
+                        <p>Start with <strong>Module 0: Bootcamp Overview & Setup</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modules Tab -->
+        <div id="modules" class="tab-content">
+            <div class="modules-container">
+                <div class="modules-header">
+                    <h2>Learning Modules</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="must-know">Must-Know</button>
+                        <button class="filter-btn" data-filter="nice-to-know">Nice-to-Know</button>
+                    </div>
+                </div>
+                <div id="modulesList" class="modules-list"></div>
+            </div>
+        </div>
+
+        <!-- Assessment Tab -->
+        <div id="assessment" class="tab-content">
+            <div class="assessment-container">
+                <h2>Assessments</h2>
+                <p class="assessment-intro">Test your knowledge with module assessments and track your readiness score.</p>
+                <div id="assessmentsList" class="assessments-list"></div>
+            </div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div id="resources" class="tab-content">
+            <div class="resources-container">
+                <h2>Learning Resources</h2>
+                <div class="resource-categories">
+                    <button class="resource-tab active" data-category="audio">Audio/Video</button>
+                    <button class="resource-tab" data-category="documentation">Documentation</button>
+                    <button class="resource-tab" data-category="tutorials">Tutorials</button>
+                    <button class="resource-tab" data-category="tools">AI Assistant Guides</button>
+                </div>
+                <div id="resourcesList" class="resources-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Module Content -->
+    <div id="moduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modalPrevBtn">Previous</button>
+                <button class="btn-primary" id="modalNextBtn">Next Lesson</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Quiz -->
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="quizTitle"></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="quizBody"></div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="submitQuizBtn">Submit Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/github-sync.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
