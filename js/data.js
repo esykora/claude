@@ -2935,5 +2935,5 @@ const RESOURCES = {
     ]
 };
 
-// Bootcamp date (first Tuesday of December 2024)
-const BOOTCAMP_DATE = new Date('2024-12-03T09:00:00');
+// Bootcamp date (December 2, 2025)
+const BOOTCAMP_DATE = new Date('2025-12-02T09:00:00');
