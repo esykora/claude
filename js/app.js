@@ -64,7 +64,7 @@ class AgentCorePrep {
 
         // Quick action buttons
         document.getElementById('continueBtn').addEventListener('click', () => {
-            this.continueLearn ing();
+            this.continueLearning();
         });
 
         document.getElementById('takeAssessmentBtn').addEventListener('click', () => {
