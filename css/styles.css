@@ -155,13 +155,30 @@ body {
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 1.5rem;
+    grid-template-areas:
+        "readiness actions"
+        "progress progress"
+        "focus focus";
 }
 
-/* Readiness Meter */
+/* Card positioning */
 .readiness-card {
-    grid-column: span 1;
+    grid-area: readiness;
+}
+
+.actions-card {
+    grid-area: actions;
+}
+
+.progress-card {
+    grid-area: progress;
+}
+
+.focus-card {
+    grid-area: focus;
 }
 
 .readiness-meter {
@@ -280,6 +297,27 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.module-progress-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.module-progress-list::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+.module-progress-list::-webkit-scrollbar-thumb {
+    background: var(--accent-primary);
+    border-radius: 3px;
+}
+
+.module-progress-list::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-secondary);
 }
 
 .module-progress-item {
@@ -740,6 +778,17 @@ body {
 }
 
 /* Responsive */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "readiness"
+            "actions"
+            "progress"
+            "focus";
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -753,6 +802,15 @@ body {
 
     .dashboard-grid {
         grid-template-columns: 1fr;
+        grid-template-areas:
+            "readiness"
+            "actions"
+            "progress"
+            "focus";
+    }
+
+    .module-progress-list {
+        max-height: 300px;
     }
 
     .nav-tabs {
