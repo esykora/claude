@@ -36,9 +36,9 @@ class AgentCorePrep {
         localStorage.setItem('agentcore-progress', JSON.stringify(this.progress));
         this.renderDashboard(); // Update readiness score
 
-        // Auto-sync to GitHub if configured (debounced to avoid excessive API calls)
-        if (window.githubSync && window.githubSync.accessToken) {
-            window.githubSync.syncProgress(true); // true = debounce
+        // Auto-sync to cloud if configured (debounced to avoid excessive API calls)
+        if (window.cloudSync && window.cloudSync.username) {
+            window.cloudSync.syncProgress(true); // true = debounce
         }
     }
 
