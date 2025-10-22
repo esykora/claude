@@ -726,6 +726,19 @@ body {
     color: var(--error);
 }
 
+/* Animations */
+@keyframes highlight {
+    0% {
+        box-shadow: 0 0 0 0 var(--accent-primary);
+    }
+    50% {
+        box-shadow: 0 0 20px 5px var(--accent-primary);
+    }
+    100% {
+        box-shadow: 0 0 0 0 var(--accent-primary);
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .container {

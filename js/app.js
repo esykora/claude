@@ -188,6 +188,20 @@ class AgentCorePrep {
                 <span class="module-name">Module ${module.id}</span>
                 <span class="module-status">${completedLessons}/${totalLessons} lessons</span>
             `;
+
+            // Make clickable - jump to modules tab and scroll to module
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', () => {
+                this.switchTab('modules');
+                setTimeout(() => {
+                    const moduleCard = document.querySelector(`.module-card[data-module-id="${module.id}"]`);
+                    if (moduleCard) {
+                        moduleCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        moduleCard.style.animation = 'highlight 1s ease';
+                    }
+                }, 100);
+            });
+
             container.appendChild(item);
         });
     }
@@ -252,6 +266,7 @@ class AgentCorePrep {
         const card = document.createElement('div');
         card.className = `module-card ${isCompleted ? 'completed' : ''}`;
         card.dataset.priority = module.priority;
+        card.dataset.moduleId = module.id;
 
         card.innerHTML = `
             <div class="module-header">
@@ -348,6 +363,12 @@ class AgentCorePrep {
         };
 
         modal.classList.add('active');
+
+        // Scroll modal to top
+        const modalBody = document.getElementById('modalBody');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
     }
 
     checkModuleCompletion(moduleId) {
