@@ -138,12 +138,14 @@ print("Setup successful!")
                     </ul>
 
                     <h3>Progress Tracking</h3>
-                    <p>Your progress is saved automatically using GitHub Gist. Click "Sync with GitHub" to:</p>
+                    <p>Your progress is saved automatically to your browser's local storage. For cross-device sync and cloud backup, click "Sync with GitHub" in the top right to:</p>
                     <ul>
-                        <li>Save your progress to the cloud</li>
-                        <li>Access your progress from any device</li>
-                        <li>Backup your learning history</li>
+                        <li><strong>One-time setup</strong>: Create a GitHub Personal Access Token (instructions provided)</li>
+                        <li><strong>Auto-sync</strong>: Progress automatically syncs to a private GitHub Gist after setup</li>
+                        <li><strong>Access anywhere</strong>: Use the same token on other devices to sync your progress</li>
+                        <li><strong>Cloud backup</strong>: Your learning history is safely stored in GitHub</li>
                     </ul>
+                    <p><em>Without GitHub sync, progress is only saved locally in your current browser.</em></p>
 
                     <h3>Readiness Score</h3>
                     <p>Your readiness score is calculated based on:</p>

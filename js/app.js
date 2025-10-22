@@ -35,6 +35,11 @@ class AgentCorePrep {
         this.progress.lastAccessed = new Date().toISOString();
         localStorage.setItem('agentcore-progress', JSON.stringify(this.progress));
         this.renderDashboard(); // Update readiness score
+
+        // Auto-sync to GitHub if configured (debounced to avoid excessive API calls)
+        if (window.githubSync && window.githubSync.accessToken) {
+            window.githubSync.syncProgress(true); // true = debounce
+        }
     }
 
     // Event Listeners

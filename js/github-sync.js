@@ -4,6 +4,7 @@ class GitHubSync {
         this.clientId = 'Ov23liVlHLU9Y5vHx9Qo'; // Public GitHub OAuth App (read-only for gists)
         this.gistId = null;
         this.accessToken = null;
+        this.syncTimeout = null;
         this.init();
     }
 
@@ -108,38 +109,49 @@ For now, you can manually create a Personal Access Token:
         }
     }
 
-    async syncProgress() {
+    async syncProgress(debounce = false) {
+        // Debounce auto-syncs to avoid excessive API calls
+        if (debounce) {
+            if (this.syncTimeout) {
+                clearTimeout(this.syncTimeout);
+            }
+            this.syncTimeout = setTimeout(() => this.syncProgress(false), 2000);
+            return;
+        }
+
         const statusSpan = document.getElementById('syncStatus');
 
         try {
-            statusSpan.textContent = 'Syncing...';
+            if (statusSpan) statusSpan.textContent = 'Syncing...';
 
             const progress = app.progress;
 
             if (this.gistId) {
                 // Update existing gist
                 await this.updateGist(progress);
-                statusSpan.textContent = 'Synced!';
+                if (statusSpan) statusSpan.textContent = 'Synced!';
             } else {
                 // Create new gist
                 const gistId = await this.createGist(progress);
                 this.gistId = gistId;
                 localStorage.setItem('github-gist-id', gistId);
-                statusSpan.textContent = 'Synced!';
+                if (statusSpan) statusSpan.textContent = 'Synced!';
             }
 
-            setTimeout(() => {
-                statusSpan.textContent = 'Sync Progress';
-            }, 2000);
+            if (statusSpan) {
+                setTimeout(() => {
+                    statusSpan.textContent = 'Sync Progress';
+                }, 2000);
+            }
 
         } catch (error) {
             console.error('Sync error:', error);
-            statusSpan.textContent = 'Sync Failed';
-            alert('Failed to sync progress. Please check your token and try again.');
-
-            setTimeout(() => {
-                statusSpan.textContent = 'Sync Progress';
-            }, 3000);
+            if (statusSpan) {
+                statusSpan.textContent = 'Sync Failed';
+                setTimeout(() => {
+                    statusSpan.textContent = 'Sync Progress';
+                }, 3000);
+            }
         }
     }
 
@@ -224,13 +236,13 @@ For now, you can manually create a Personal Access Token:
 }
 
 // Initialize GitHub sync
-let githubSync;
+window.githubSync = null;
 document.addEventListener('DOMContentLoaded', () => {
-    githubSync = new GitHubSync();
+    window.githubSync = new GitHubSync();
 
     // Try to load progress from Gist on startup
-    if (githubSync.accessToken && githubSync.gistId) {
-        githubSync.loadFromGist().then(progress => {
+    if (window.githubSync.accessToken && window.githubSync.gistId) {
+        window.githubSync.loadFromGist().then(progress => {
             if (progress && confirm('Load progress from cloud?')) {
                 localStorage.setItem('agentcore-progress', JSON.stringify(progress));
                 location.reload();
