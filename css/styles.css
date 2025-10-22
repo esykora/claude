@@ -69,6 +69,16 @@ body {
     font-size: 0.95rem;
 }
 
+.sync-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#syncBtn {
+    white-space: nowrap;
+}
+
 /* Navigation Tabs */
 .nav-tabs {
     display: flex;
