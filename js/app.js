@@ -175,7 +175,7 @@ class AgentCorePrep {
         const container = document.getElementById('moduleProgressList');
         container.innerHTML = '';
 
-        MODULES.slice(0, 6).forEach(module => { // Show first 6 modules
+        MODULES.forEach(module => { // Show all modules
             const isCompleted = this.progress.completedModules.includes(module.id);
             const completedLessons = module.lessons?.filter(l =>
                 this.progress.completedLessons.includes(l.id)
