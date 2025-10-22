@@ -1218,13 +1218,1590 @@ def execute_code(code: str) -> str:
                 correct: 1
             }
         ]
+    },
+    {
+        id: 3,
+        title: "Module 3: AWS Fundamentals & Bedrock",
+        priority: "must-know",
+        estimatedHours: 6,
+        description: "Learn AWS basics, IAM, and Amazon Bedrock foundation models essential for building AI agents.",
+        lessons: [
+            {
+                id: "m3-l1",
+                title: "AWS Account and IAM Basics",
+                content: `
+                    <h3>AWS Account Setup</h3>
+                    <p>Amazon Web Services (AWS) is the cloud platform where you'll deploy your AI agents.</p>
+
+                    <h3>Key AWS Concepts</h3>
+                    <ul>
+                        <li><strong>Regions</strong>: Physical locations worldwide (e.g., us-east-1, eu-west-1)</li>
+                        <li><strong>Availability Zones</strong>: Isolated data centers within a region</li>
+                        <li><strong>Services</strong>: Building blocks like Bedrock, Lambda, S3</li>
+                        <li><strong>Resources</strong>: Instances of services (e.g., a specific Lambda function)</li>
+                    </ul>
+
+                    <h3>Identity and Access Management (IAM)</h3>
+                    <p>IAM controls who can access what in your AWS account.</p>
+
+                    <pre><code># Key IAM Components:
+1. Users - Individual people
+2. Groups - Collections of users
+3. Roles - Temporary permissions for services
+4. Policies - JSON documents defining permissions
+</code></pre>
+
+                    <h3>Creating an IAM User for Development</h3>
+                    <pre><code># In AWS Console:
+1. Go to IAM → Users → Create User
+2. Name: "agentcore-dev"
+3. Attach policies:
+   - AmazonBedrockFullAccess
+   - IAMReadOnlyAccess
+4. Create access keys for CLI
+5. Save credentials securely
+</code></pre>
+
+                    <h3>IAM Policy Example</h3>
+                    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+</code></pre>
+
+                    <h3>Configuring AWS CLI</h3>
+                    <pre><code># Install AWS CLI first
+pip install awscli
+
+# Configure credentials
+aws configure
+
+# Enter when prompted:
+AWS Access Key ID: YOUR_KEY
+AWS Secret Access Key: YOUR_SECRET
+Default region: us-east-1
+Default output format: json
+
+# Test configuration
+aws sts get-caller-identity
+</code></pre>
+
+                    <h3>Best Practices</h3>
+                    <ul>
+                        <li>Never use root account for daily work</li>
+                        <li>Enable MFA (Multi-Factor Authentication)</li>
+                        <li>Use principle of least privilege (minimum permissions needed)</li>
+                        <li>Rotate access keys regularly</li>
+                        <li>Use IAM roles for EC2/Lambda instead of hardcoded keys</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html" target="_blank">IAM User Guide</a></li>
+                        <li><a href="https://aws.amazon.com/getting-started/" target="_blank">AWS Getting Started</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m3-l2",
+                title: "Introduction to Amazon Bedrock",
+                content: `
+                    <h3>What is Amazon Bedrock?</h3>
+                    <p>Amazon Bedrock is a fully managed service that provides access to foundation models (FMs) from leading AI companies through a single API.</p>
+
+                    <h3>Available Foundation Models</h3>
+                    <ul>
+                        <li><strong>Anthropic Claude</strong>: Claude 4 Sonnet, Claude 3.5 Sonnet (best for agents)</li>
+                        <li><strong>Meta Llama</strong>: Llama 4 models</li>
+                        <li><strong>Amazon Titan</strong>: Amazon's own models</li>
+                        <li><strong>AI21 Jurassic</strong>: Enterprise-focused models</li>
+                        <li><strong>Cohere</strong>: Command models</li>
+                    </ul>
+
+                    <h3>Why Bedrock for AI Agents?</h3>
+                    <ul>
+                        <li><strong>Managed Infrastructure</strong>: No model hosting required</li>
+                        <li><strong>Security</strong>: Data doesn't leave AWS, enterprise compliance</li>
+                        <li><strong>Scalability</strong>: Auto-scales with demand</li>
+                        <li><strong>Model Choice</strong>: Switch models without code changes</li>
+                        <li><strong>Integration</strong>: Works seamlessly with other AWS services</li>
+                    </ul>
+
+                    <h3>Requesting Model Access</h3>
+                    <pre><code># In AWS Console:
+1. Go to Amazon Bedrock
+2. Click "Model access" in left sidebar
+3. Click "Modify model access"
+4. Select models (especially Claude 4 Sonnet)
+5. Submit request (usually approved instantly)
+6. Wait for "Access granted" status
+</code></pre>
+
+                    <h3>Bedrock Regions</h3>
+                    <p>Not all models are available in all regions. For AgentCore:</p>
+                    <ul>
+                        <li><strong>us-east-1</strong> (N. Virginia) - Most models, best for testing</li>
+                        <li><strong>us-west-2</strong> (Oregon) - Good alternative</li>
+                        <li><strong>eu-west-1</strong> (Ireland) - For EU deployments</li>
+                    </ul>
+
+                    <h3>Basic Bedrock API Call</h3>
+                    <pre><code>import boto3
+import json
+
+# Create Bedrock client
+bedrock = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1'
+)
+
+# Prepare request
+body = json.dumps({
+    "anthropic_version": "bedrock-2023-05-31",
+    "max_tokens": 1024,
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello, Claude!"
+        }
+    ]
+})
+
+# Call model
+response = bedrock.invoke_model(
+    modelId='anthropic.claude-4-sonnet-20250514-v1:0',
+    body=body
+)
+
+# Parse response
+result = json.loads(response['body'].read())
+print(result['content'][0]['text'])
+</code></pre>
+
+                    <h3>Bedrock Pricing</h3>
+                    <p>Pay only for what you use:</p>
+                    <ul>
+                        <li><strong>Input tokens</strong>: Text sent to model</li>
+                        <li><strong>Output tokens</strong>: Text generated by model</li>
+                        <li>Claude 4 Sonnet: ~$3 per million input tokens, ~$15 per million output tokens</li>
+                        <li>No upfront costs or minimum fees</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank">Amazon Bedrock Documentation</a></li>
+                        <li><a href="https://aws.amazon.com/bedrock/pricing/" target="_blank">Bedrock Pricing</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html" target="_blank">Bedrock Model IDs</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m3-l3",
+                title: "Bedrock vs AgentCore vs Strands",
+                content: `
+                    <h3>Understanding the Stack</h3>
+                    <p>It's important to understand how these three layers work together:</p>
+
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <tr style="background: var(--bg-tertiary);">
+                            <th style="padding: 0.75rem; text-align: left;">Layer</th>
+                            <th style="padding: 0.75rem; text-align: left;">What It Does</th>
+                            <th style="padding: 0.75rem; text-align: left;">Your Interaction</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem;"><strong>Amazon Bedrock</strong></td>
+                            <td style="padding: 0.75rem;">Provides access to LLMs</td>
+                            <td style="padding: 0.75rem;">Rarely direct - via Strands SDK</td>
+                        </tr>
+                        <tr style="background: var(--bg-tertiary);">
+                            <td style="padding: 0.75rem;"><strong>AgentCore</strong></td>
+                            <td style="padding: 0.75rem;">7 managed services for enterprise agents</td>
+                            <td style="padding: 0.75rem;">Configure services, monitor agents</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem;"><strong>Strands SDK</strong></td>
+                            <td style="padding: 0.75rem;">Python framework to build agents</td>
+                            <td style="padding: 0.75rem;">Write code here - main focus</td>
+                        </tr>
+                    </table>
+
+                    <h3>The Full Picture</h3>
+                    <pre><code>┌─────────────────────────────────────┐
+│   Your Python Code (Strands SDK)   │  ← You write this
+├─────────────────────────────────────┤
+│    Amazon Bedrock AgentCore         │  ← Managed services
+│  (Memory, Runtime, Code Execution,  │
+│   Tools, etc.)                      │
+├─────────────────────────────────────┤
+│      Amazon Bedrock                 │  ← Foundation models
+│  (Claude, Llama, etc.)              │
+├─────────────────────────────────────┤
+│           AWS Cloud                 │  ← Infrastructure
+└─────────────────────────────────────┘
+</code></pre>
+
+                    <h3>When to Use What</h3>
+
+                    <p><strong>Use Bedrock directly when:</strong></p>
+                    <ul>
+                        <li>Simple LLM calls (chat, completion)</li>
+                        <li>No tool-calling needed</li>
+                        <li>Prototyping and testing</li>
+                    </ul>
+
+                    <p><strong>Use Strands SDK when:</strong></p>
+                    <ul>
+                        <li>Building agents with tools</li>
+                        <li>Multi-step reasoning required</li>
+                        <li>Need ReAct pattern</li>
+                        <li>Local development and testing</li>
+                    </ul>
+
+                    <p><strong>Use AgentCore when:</strong></p>
+                    <ul>
+                        <li>Production deployments</li>
+                        <li>Need enterprise features (memory, security, monitoring)</li>
+                        <li>Scaling to many users</li>
+                        <li>Require compliance and governance</li>
+                    </ul>
+
+                    <h3>Strands + AgentCore Integration</h3>
+                    <pre><code>from strands import Agent
+from strands.integrations.bedrock import BedrockAgentCore
+
+# Development: Uses Bedrock directly
+agent = Agent(
+    model="claude-4-sonnet",
+    tools=[my_tool]
+)
+
+# Production: Uses AgentCore services
+agent = Agent(
+    model="claude-4-sonnet",
+    tools=[my_tool],
+    runtime=BedrockAgentCore(
+        memory_enabled=True,
+        guardrails_enabled=True
+    )
+)
+</code></pre>
+
+                    <h3>Cost Considerations</h3>
+                    <ul>
+                        <li><strong>Bedrock</strong>: Pay per token (input + output)</li>
+                        <li><strong>AgentCore services</strong>: Additional charges for memory, runtime, etc.</li>
+                        <li><strong>Strands SDK</strong>: Free and open-source</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/bedrock-agentcore/" target="_blank">AgentCore Developer Guide</a></li>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/" target="_blank">Strands SDK Documentation</a></li>
+                        <li><a href="https://aws.amazon.com/blogs/opensource/introducing-strands-agents-an-open-source-ai-agents-sdk/" target="_blank">Strands SDK Introduction Blog</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m3-l4",
+                title: "AWS SDK for Python (Boto3)",
+                content: `
+                    <h3>What is Boto3?</h3>
+                    <p>Boto3 is the official AWS SDK for Python. It allows you to interact with AWS services from your code.</p>
+
+                    <h3>Installation</h3>
+                    <pre><code>pip install boto3</code></pre>
+
+                    <h3>Basic Boto3 Usage</h3>
+                    <pre><code>import boto3
+
+# Create a client for a service
+s3 = boto3.client('s3')
+bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
+
+# Create a resource (higher-level interface)
+s3_resource = boto3.resource('s3')
+bucket = s3_resource.Bucket('my-bucket')
+</code></pre>
+
+                    <h3>Boto3 for Bedrock</h3>
+                    <pre><code>import boto3
+import json
+
+# Create Bedrock Runtime client
+bedrock = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1'
+)
+
+# Invoke a model
+response = bedrock.invoke_model(
+    modelId='anthropic.claude-4-sonnet-20250514-v1:0',
+    body=json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 1024,
+        "messages": [{"role": "user", "content": "Hello!"}]
+    })
+)
+
+# Parse response
+result = json.loads(response['body'].read())
+print(result)
+</code></pre>
+
+                    <h3>Credentials Configuration</h3>
+                    <p>Boto3 looks for credentials in this order:</p>
+                    <ol>
+                        <li>Environment variables (<code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>)</li>
+                        <li>Shared credentials file (<code>~/.aws/credentials</code>)</li>
+                        <li>IAM role (when running on EC2, Lambda, etc.)</li>
+                    </ol>
+
+                    <pre><code># Using environment variables
+import os
+os.environ['AWS_ACCESS_KEY_ID'] = 'your_key'
+os.environ['AWS_SECRET_ACCESS_KEY'] = 'your_secret'
+os.environ['AWS_REGION'] = 'us-east-1'
+
+# Or use credentials file (~/.aws/credentials)
+[default]
+aws_access_key_id = your_key
+aws_secret_access_key = your_secret
+region = us-east-1
+</code></pre>
+
+                    <h3>Error Handling</h3>
+                    <pre><code>from botocore.exceptions import ClientError
+
+try:
+    response = bedrock.invoke_model(...)
+except ClientError as e:
+    error_code = e.response['Error']['Code']
+    if error_code == 'ResourceNotFoundException':
+        print("Model not found")
+    elif error_code == 'AccessDeniedException':
+        print("Access denied - check IAM permissions")
+    else:
+        print(f"Error: {e}")
+</code></pre>
+
+                    <h3>Strands SDK Under the Hood</h3>
+                    <p>Strands SDK uses Boto3 internally to call Bedrock. When you do:</p>
+                    <pre><code>from strands import Agent
+
+agent = Agent(model="claude-4-sonnet")
+</code></pre>
+
+                    <p>Strands is automatically:</p>
+                    <ul>
+                        <li>Creating a Boto3 Bedrock client</li>
+                        <li>Formatting messages in Bedrock format</li>
+                        <li>Handling tool-calling protocol</li>
+                        <li>Managing conversation history</li>
+                    </ul>
+
+                    <h3>When to Use Boto3 Directly</h3>
+                    <ul>
+                        <li>Accessing other AWS services (S3, DynamoDB, etc.)</li>
+                        <li>Custom Bedrock configurations</li>
+                        <li>Low-level control needed</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://boto3.amazonaws.com/v1/documentation/api/latest/index.html" target="_blank">Boto3 Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-runtime_example_bedrock-runtime_InvokeModel_AnthropicClaude_section.html" target="_blank">Bedrock Runtime Examples</a></li>
+                    </ul>
+                `
+            }
+        ],
+        quiz: [
+            {
+                question: "What is the purpose of AWS IAM?",
+                options: [
+                    "To host websites",
+                    "To control who can access what in AWS",
+                    "To store data",
+                    "To run code"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is Amazon Bedrock?",
+                options: [
+                    "A database service",
+                    "A fully managed service providing access to foundation models",
+                    "A storage service",
+                    "A networking service"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which layer do you primarily write code in when building agents?",
+                options: [
+                    "Amazon Bedrock",
+                    "AgentCore",
+                    "Strands SDK",
+                    "AWS Cloud"
+                ],
+                correct: 2
+            },
+            {
+                question: "What is Boto3?",
+                options: [
+                    "A Python web framework",
+                    "The AWS SDK for Python",
+                    "A database driver",
+                    "An AI model"
+                ],
+                correct: 1
+            }
+        ]
+    },
+    {
+        id: 4,
+        title: "Module 4: Amazon Bedrock AgentCore Deep Dive",
+        priority: "must-know",
+        estimatedHours: 6,
+        description: "Explore the 7 managed services of AgentCore and learn how to deploy production-ready AI agents.",
+        lessons: [
+            {
+                id: "m4-l1",
+                title: "AgentCore Overview - The 7 Services",
+                content: `
+                    <h3>What is Amazon Bedrock AgentCore?</h3>
+                    <p>AgentCore is an enterprise platform providing 7 managed services to build, deploy, and operate AI agents at scale.</p>
+
+                    <h3>The 7 Core Services</h3>
+                    <ol>
+                        <li><strong>Runtime</strong>: Orchestrates agent execution and tool calling</li>
+                        <li><strong>Memory</strong>: Stores and retrieves conversation context</li>
+                        <li><strong>Code Execution</strong>: Runs Python code in secure sandboxes</li>
+                        <li><strong>Tools</strong>: Manages and executes agent tools</li>
+                        <li><strong>Guardrails</strong>: Enforces safety and compliance policies</li>
+                        <li><strong>Observability</strong>: Monitors agent performance and behavior</li>
+                        <li><strong>Knowledge Bases</strong>: RAG (Retrieval-Augmented Generation) for agents</li>
+                    </ol>
+
+                    <h3>Why Use AgentCore?</h3>
+                    <ul>
+                        <li><strong>Production-Ready</strong>: Enterprise security, compliance, scalability</li>
+                        <li><strong>Managed Infrastructure</strong>: No servers to manage</li>
+                        <li><strong>Multi-Tenant</strong>: Isolate data per user/customer</li>
+                        <li><strong>Integrated</strong>: Works seamlessly with Strands SDK</li>
+                        <li><strong>Observable</strong>: Built-in logging, tracing, metrics</li>
+                    </ul>
+
+                    <h3>AgentCore Architecture</h3>
+                    <pre><code>User Request
+     ↓
+[AgentCore Runtime]
+     ↓
+[Bedrock LLM] ←→ [Tools Service]
+     ↓                    ↓
+[Memory Service]    [Code Execution]
+     ↓                    ↓
+[Guardrails] ←→ [Observability]
+     ↓
+Response
+</code></pre>
+
+                    <h3>Development vs Production</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <tr style="background: var(--bg-tertiary);">
+                            <th style="padding: 0.75rem;">Development (Strands Local)</th>
+                            <th style="padding: 0.75rem;">Production (AgentCore)</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem;">Rapid iteration</td>
+                            <td style="padding: 0.75rem;">Enterprise security</td>
+                        </tr>
+                        <tr style="background: var(--bg-tertiary);">
+                            <td style="padding: 0.75rem;">Local testing</td>
+                            <td style="padding: 0.75rem;">Multi-tenant isolation</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem;">No infrastructure</td>
+                            <td style="padding: 0.75rem;">Auto-scaling</td>
+                        </tr>
+                        <tr style="background: var(--bg-tertiary);">
+                            <td style="padding: 0.75rem;">Basic memory</td>
+                            <td style="padding: 0.75rem;">Persistent memory</td>
+                        </tr>
+                    </table>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is.html" target="_blank">AgentCore Developer Guide</a></li>
+                        <li><a href="https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-agentcore-securely-deploy-and-operate-ai-agents-at-any-scale/" target="_blank">AgentCore Announcement Blog</a></li>
+                        <li><a href="https://aws.github.io/bedrock-agentcore-starter-toolkit/" target="_blank">AgentCore Starter Toolkit</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m4-l2",
+                title: "Memory Service",
+                content: `
+                    <h3>Why Memory Matters</h3>
+                    <p>Agents need to remember:</p>
+                    <ul>
+                        <li>User preferences and context</li>
+                        <li>Previous interactions</li>
+                        <li>Task progress</li>
+                        <li>Historical data for personalization</li>
+                    </ul>
+
+                    <h3>Types of Memory</h3>
+                    <p><strong>1. Short-Term Memory (Conversation History)</strong></p>
+                    <pre><code># Automatically managed by AgentCore
+User: "My name is Sarah"
+Agent: "Nice to meet you, Sarah!"
+User: "What's my name?"
+Agent: "Your name is Sarah"
+</code></pre>
+
+                    <p><strong>2. Long-Term Memory (Persistent Storage)</strong></p>
+                    <pre><code># Stored across sessions
+Session 1: "I prefer email updates"
+Session 2 (days later): Agent remembers preference
+</code></pre>
+
+                    <h3>Using Memory in Strands</h3>
+                    <pre><code>from strands import Agent
+from strands.memory import ConversationMemory
+
+# Simple conversation memory
+agent = Agent(
+    model="claude-4-sonnet",
+    memory=ConversationMemory()
+)
+
+# With AgentCore persistent memory
+from strands.integrations.bedrock import BedrockMemory
+
+agent = Agent(
+    model="claude-4-sonnet",
+    memory=BedrockMemory(
+        session_id="user-123",
+        persist=True
+    )
+)
+</code></pre>
+
+                    <h3>Memory Configuration</h3>
+                    <pre><code># Control memory behavior
+memory = BedrockMemory(
+    session_id="user-123",
+    max_messages=20,        # Keep last 20 messages
+    summarize_old=True,     # Summarize older context
+    ttl_hours=24           # Expire after 24 hours
+)
+</code></pre>
+
+                    <h3>Multi-User Memory Isolation</h3>
+                    <pre><code># Each user gets isolated memory
+user1_agent = Agent(
+    memory=BedrockMemory(session_id="user-001")
+)
+
+user2_agent = Agent(
+    memory=BedrockMemory(session_id="user-002")
+)
+
+# user-001 and user-002 memories are completely separate
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory.html" target="_blank">AgentCore Memory Documentation</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m4-l3",
+                title: "Runtime Service",
+                content: `
+                    <h3>What is AgentCore Runtime?</h3>
+                    <p>The Runtime service orchestrates agent execution:</p>
+                    <ul>
+                        <li>Manages the ReAct loop (Reason → Act → Observe)</li>
+                        <li>Handles tool calling</li>
+                        <li>Enforces guardrails</li>
+                        <li>Tracks execution metrics</li>
+                    </ul>
+
+                    <h3>Runtime Configuration</h3>
+                    <pre><code>from strands import Agent
+from strands.integrations.bedrock import BedrockRuntime
+
+agent = Agent(
+    model="claude-4-sonnet",
+    runtime=BedrockRuntime(
+        max_iterations=10,      # Max tool-calling loops
+        timeout_seconds=30,     # Execution timeout
+        enable_tracing=True     # CloudWatch tracing
+    )
+)
+</code></pre>
+
+                    <h3>Execution Limits</h3>
+                    <ul>
+                        <li><strong>Max iterations</strong>: Prevents infinite loops</li>
+                        <li><strong>Timeout</strong>: Prevents runaway execution</li>
+                        <li><strong>Token limits</strong>: Controls cost</li>
+                        <li><strong>Rate limiting</strong>: Prevents abuse</li>
+                    </ul>
+
+                    <h3>Monitoring Runtime</h3>
+                    <pre><code># Runtime emits CloudWatch metrics
+- ToolCallCount: Number of tools invoked
+- IterationCount: ReAct loop iterations
+- ExecutionDuration: Total execution time
+- ErrorRate: Failed executions
+</code></pre>
+
+                    <h3>Scaling with Runtime</h3>
+                    <p>AgentCore Runtime automatically:</p>
+                    <ul>
+                        <li>Scales to handle concurrent requests</li>
+                        <li>Load balances across availability zones</li>
+                        <li>Queues requests during spikes</li>
+                        <li>Retries failed executions</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime.html" target="_blank">AgentCore Runtime Documentation</a></li>
+                        <li><a href="https://aws.github.io/bedrock-agentcore-starter-toolkit/user-guide/runtime/quickstart.html" target="_blank">Runtime Quickstart Guide</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m4-l4",
+                title: "Guardrails and Security",
+                content: `
+                    <h3>Why Guardrails?</h3>
+                    <p>Guardrails prevent agents from:</p>
+                    <ul>
+                        <li>Generating harmful content</li>
+                        <li>Leaking sensitive data (PII, credentials)</li>
+                        <li>Performing unauthorized actions</li>
+                        <li>Violating compliance policies</li>
+                    </ul>
+
+                    <h3>Types of Guardrails</h3>
+                    <p><strong>1. Content Filters</strong></p>
+                    <pre><code># Block harmful content categories
+guardrail = Guardrail(
+    content_filters=[
+        "hate_speech",
+        "violence",
+        "sexual_content",
+        "profanity"
+    ],
+    threshold="MEDIUM"  # LOW, MEDIUM, HIGH
+)
+</code></pre>
+
+                    <p><strong>2. PII Redaction</strong></p>
+                    <pre><code># Automatically redact sensitive data
+guardrail = Guardrail(
+    pii_redaction=[
+                        "email",
+        "ssn",
+        "credit_card",
+        "phone_number"
+    ]
+)
+
+# Input: "My email is alice@example.com"
+# Filtered: "My email is [EMAIL]"
+</code></pre>
+
+                    <p><strong>3. Topic Filtering</strong></p>
+                    <pre><code># Block specific topics
+guardrail = Guardrail(
+    denied_topics=[
+        "medical_advice",
+        "legal_advice",
+        "financial_advice"
+    ]
+)
+</code></pre>
+
+                    <p><strong>4. Word Filters</strong></p>
+                    <pre><code># Block specific words/phrases
+guardrail = Guardrail(
+    blocked_words=["confidential", "internal", "secret"]
+)
+</code></pre>
+
+                    <h3>Applying Guardrails</h3>
+                    <pre><code>from strands import Agent
+from strands.integrations.bedrock import BedrockGuardrail
+
+agent = Agent(
+    model="claude-4-sonnet",
+    guardrails=BedrockGuardrail(
+        guardrail_id="your-guardrail-id",
+        version="1.0"
+    )
+)
+
+# Guardrails applied to both input and output
+response = agent.run("User message")
+</code></pre>
+
+                    <h3>Security Best Practices</h3>
+                    <ul>
+                        <li><strong>IAM Policies</strong>: Least-privilege access</li>
+                        <li><strong>VPC Endpoints</strong>: Private network access</li>
+                        <li><strong>Encryption</strong>: At-rest and in-transit</li>
+                        <li><strong>Audit Logging</strong>: CloudTrail for all actions</li>
+                        <li><strong>Secrets Management</strong>: AWS Secrets Manager</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html" target="_blank">Bedrock Guardrails Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/security.html" target="_blank">AgentCore Security Guide</a></li>
+                    </ul>
+                `
+            }
+        ],
+        quiz: [
+            {
+                question: "How many managed services does AgentCore provide?",
+                options: ["3", "5", "7", "10"],
+                correct: 2
+            },
+            {
+                question: "What is the purpose of AgentCore's Memory service?",
+                options: [
+                    "To store files",
+                    "To store and retrieve conversation context",
+                    "To cache API calls",
+                    "To store code"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does the Runtime service do?",
+                options: [
+                    "Stores data",
+                    "Orchestrates agent execution and tool calling",
+                    "Compiles code",
+                    "Manages users"
+                ],
+                correct: 1
+            },
+            {
+                question: "Why are Guardrails important?",
+                options: [
+                    "To make agents faster",
+                    "To prevent harmful content and unauthorized actions",
+                    "To reduce costs",
+                    "To improve accuracy"
+                ],
+                correct: 1
+            }
+        ]
+    },
+    {
+        id: 5,
+        title: "Module 5: Strands SDK Fundamentals",
+        priority: "must-know",
+        estimatedHours: 4,
+        description: "Master the Strands SDK - learn to create agents, define tools, and configure agent behavior.",
+        lessons: [
+            {
+                id: "m5-l1",
+                title: "Installing and Setting Up Strands SDK",
+                content: `
+                    <h3>Installation</h3>
+                    <pre><code># Install Strands SDK
+pip install strands-agents
+
+# Verify installation
+python -c "import strands; print(strands.__version__)"
+</code></pre>
+
+                    <h3>Dependencies</h3>
+                    <p>Strands automatically installs:</p>
+                    <ul>
+                        <li><code>boto3</code>: AWS SDK for Bedrock</li>
+                        <li><code>pydantic</code>: Data validation</li>
+                        <li><code>httpx</code>: HTTP client for async</li>
+                    </ul>
+
+                    <h3>Project Structure</h3>
+                    <pre><code>my-agent-project/
+├── .env                  # API keys and config
+├── requirements.txt      # Python dependencies
+├── agent.py             # Main agent code
+├── tools/               # Custom tools
+│   ├── __init__.py
+│   ├── search.py
+│   └── calculator.py
+└── tests/               # Unit tests
+    └── test_agent.py
+</code></pre>
+
+                    <h3>Environment Setup</h3>
+                    <pre><code># .env file
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+
+# Or use AWS CLI credentials (recommended)
+# AWS credentials are automatically detected from ~/.aws/credentials
+</code></pre>
+
+                    <h3>Your First Agent</h3>
+                    <pre><code>from strands import Agent
+
+# Create a simple agent
+agent = Agent(
+    model="claude-4-sonnet",
+    system_prompt="You are a helpful assistant."
+)
+
+# Run the agent
+response = agent.run("Hello! What can you help me with?")
+print(response)
+</code></pre>
+
+                    <h3>Development Tools</h3>
+                    <pre><code># Install additional dev tools
+pip install strands-agents[dev]
+
+# Includes:
+# - pytest: Testing
+# - black: Code formatting
+# - mypy: Type checking
+# - ipython: Interactive shell
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/quickstart.html" target="_blank">Strands Quickstart Guide</a></li>
+                        <li><a href="https://github.com/strands-agents/sdk-python" target="_blank">Strands SDK GitHub Repository</a></li>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/installation.html" target="_blank">Installation Documentation</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m5-l2",
+                title: "Creating Your First Agent",
+                content: `
+                    <h3>Basic Agent Creation</h3>
+                    <pre><code>from strands import Agent
+
+# Simple conversational agent
+agent = Agent(
+    model="claude-4-sonnet",
+    system_prompt="You are a helpful AI assistant specializing in Python programming."
+)
+
+# Interact with the agent
+response = agent.run("Explain list comprehensions")
+print(response)
+</code></pre>
+
+                    <h3>Agent Configuration Options</h3>
+                    <pre><code>agent = Agent(
+    model="claude-4-sonnet",
+
+    # Behavior
+    system_prompt="Your agent's personality and instructions",
+
+    # Model parameters
+    temperature=0.7,          # Creativity (0-1)
+    max_tokens=4096,          # Response length
+    top_p=0.9,               # Nucleus sampling
+
+    # Agent features
+    tools=[],                # List of tools
+    memory=None,             # Memory implementation
+    max_iterations=10,       # Max ReAct loops
+
+    # AWS configuration
+    region="us-east-1",
+    profile="default"        # AWS CLI profile
+)
+</code></pre>
+
+                    <h3>System Prompts</h3>
+                    <p>The system prompt defines your agent's behavior:</p>
+                    <pre><code># Good system prompt
+system_prompt = """You are a Python coding assistant for product managers.
+
+Your role:
+1. Explain code concepts in simple, non-technical terms
+2. Provide working code examples
+3. Focus on practical applications
+4. Ask clarifying questions when needed
+
+Style:
+- Use analogies to explain complex ideas
+- Break down problems step-by-step
+- Be encouraging and patient
+"""
+
+agent = Agent(
+    model="claude-4-sonnet",
+    system_prompt=system_prompt
+)
+</code></pre>
+
+                    <h3>Conversation Flow</h3>
+                    <pre><code># Single interaction
+response = agent.run("What is a decorator?")
+
+# Multi-turn conversation (memory handled automatically)
+agent.run("Tell me about Python decorators")
+agent.run("Can you show me an example?")
+agent.run("How would I use this in an AI agent?")
+</code></pre>
+
+                    <h3>Async Agents</h3>
+                    <pre><code>import asyncio
+from strands import Agent
+
+async def main():
+    agent = Agent(model="claude-4-sonnet")
+
+    # Async execution
+    response = await agent.arun("Hello!")
+    print(response)
+
+asyncio.run(main())
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/agents.html" target="_blank">Agent Configuration Guide</a></li>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/prompting.html" target="_blank">System Prompt Best Practices</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m5-l3",
+                title: "Defining Tools with @tool Decorator",
+                content: `
+                    <h3>What Are Tools?</h3>
+                    <p>Tools give agents the ability to interact with the world:</p>
+                    <ul>
+                        <li>Search the web</li>
+                        <li>Read/write files</li>
+                        <li>Query databases</li>
+                        <li>Call APIs</li>
+                        <li>Perform calculations</li>
+                    </ul>
+
+                    <h3>Creating a Simple Tool</h3>
+                    <pre><code>from strands import tool
+
+@tool
+def get_weather(city: str) -> str:
+                    """Get the current weather for a city.
+
+    Args:
+        city: Name of the city
+
+    Returns:
+        Weather information as a string
+    """
+    # In real implementation, call a weather API
+    return f"The weather in {city} is sunny, 72°F"
+
+# Use the tool with an agent
+from strands import Agent
+
+agent = Agent(
+    model="claude-4-sonnet",
+    tools=[get_weather]
+)
+
+response = agent.run("What's the weather in San Francisco?")
+# Agent automatically calls get_weather("San Francisco")
+</code></pre>
+
+                    <h3>Tool Best Practices</h3>
+                    <ol>
+                        <li><strong>Clear names</strong>: Use descriptive function names</li>
+                        <li><strong>Type hints</strong>: Always include type annotations</li>
+                        <li><strong>Docstrings</strong>: LLM uses this to understand the tool</li>
+                        <li><strong>Error handling</strong>: Return helpful error messages</li>
+                        <li><strong>Single purpose</strong>: One tool, one responsibility</li>
+                    </ol>
+
+                    <h3>Advanced Tool Example</h3>
+                    <pre><code>from strands import tool
+import requests
+
+@tool
+def search_wikipedia(query: str, max_results: int = 3) -> str:
+    """Search Wikipedia for information.
+
+    Args:
+        query: The search query
+        max_results: Maximum number of results (default: 3)
+
+    Returns:
+        Formatted search results
+    """
+    try:
+        url = "https://en.wikipedia.org/w/api.php"
+        params = {
+            "action": "opensearch",
+            "search": query,
+            "limit": max_results,
+            "format": "json"
+        }
+        response = requests.get(url, params=params, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+        titles = data[1]
+        descriptions = data[2]
+
+        results = []
+        for title, desc in zip(titles, descriptions):
+            results.append(f"**{title}**: {desc}")
+
+        return "\\n\\n".join(results) if results else "No results found"
+
+    except Exception as e:
+        return f"Error searching Wikipedia: {str(e)}"
+</code></pre>
+
+                    <h3>Multiple Tools</h3>
+                    <pre><code>from strands import Agent, tool
+
+@tool
+def calculate(expression: str) -> str:
+    """Safely evaluate a mathematical expression."""
+    try:
+        # In production, use a safe math parser
+        result = eval(expression, {"__builtins__": {}}, {})
+        return str(result)
+    except Exception as e:
+        return f"Calculation error: {e}"
+
+@tool
+def search_web(query: str) -> str:
+    """Search the web for information."""
+    # Implementation here
+    return f"Search results for: {query}"
+
+# Agent with multiple tools
+agent = Agent(
+    model="claude-4-sonnet",
+    tools=[calculate, search_web],
+    system_prompt="Use tools to help answer questions."
+)
+
+# Agent can choose which tool to use
+agent.run("What is 15% of 1000, and search for Python tutorials")
+</code></pre>
+
+                    <h3>Tool Schema</h3>
+                    <p>Strands automatically converts your tool to a schema the LLM understands:</p>
+                    <pre><code># Your Python function:
+@tool
+def get_weather(city: str) -> str:
+    """Get weather for a city."""
+    pass
+
+# Becomes this schema for the LLM:
+{
+    "name": "get_weather",
+    "description": "Get weather for a city.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "city": {"type": "string"}
+        },
+        "required": ["city"]
+    }
+}
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/tools.html" target="_blank">Strands Tools Documentation</a></li>
+                        <li><a href="https://github.com/strands-agents/sdk-python/tree/main/examples" target="_blank">Tool Examples on GitHub</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m5-l4",
+                title: "Agent Configuration and Testing",
+                content: `
+                    <h3>Advanced Configuration</h3>
+                    <pre><code>from strands import Agent
+from strands.memory import ConversationMemory
+
+agent = Agent(
+    # Model settings
+    model="claude-4-sonnet",
+    temperature=0.3,         # Lower = more focused
+    max_tokens=2048,
+
+    # Agent behavior
+    system_prompt="You are a helpful assistant",
+    max_iterations=5,        # Limit tool-calling loops
+
+    # Memory
+    memory=ConversationMemory(
+        max_messages=20      # Keep last 20 messages
+    ),
+
+    # Tools
+    tools=[my_tool_1, my_tool_2],
+
+    # Logging
+    verbose=True            # Print agent reasoning
+)
+</code></pre>
+
+                    <h3>Logging and Debugging</h3>
+                    <pre><code># Enable verbose mode to see agent thinking
+agent = Agent(
+    model="claude-4-sonnet",
+    tools=[calculator],
+    verbose=True  # Shows ReAct loop
+)
+
+response = agent.run("What is 15% of 230?")
+
+# Output shows:
+# [Thought] I need to calculate 15% of 230
+# [Tool Call] calculator("230 * 0.15")
+# [Tool Result] "34.5"
+# [Thought] I have the answer
+# [Response] "15% of 230 is 34.5"
+</code></pre>
+
+                    <h3>Testing Your Agent</h3>
+                    <pre><code># test_agent.py
+import pytest
+from strands import Agent, tool
+
+@tool
+def mock_weather(city: str) -> str:
+    """Mock weather tool for testing."""
+    return f"Sunny, 72°F in {city}"
+
+def test_agent_uses_tool():
+    agent = Agent(
+        model="claude-4-sonnet",
+        tools=[mock_weather]
+    )
+
+    response = agent.run("What's the weather in Boston?")
+
+    assert "Boston" in response
+    assert "72" in response or "Sunny" in response
+
+def test_agent_without_tools():
+    agent = Agent(model="claude-4-sonnet")
+
+    response = agent.run("Hello!")
+
+    assert len(response) > 0
+    assert isinstance(response, str)
+
+# Run tests
+# pytest test_agent.py
+</code></pre>
+
+                    <h3>Error Handling</h3>
+                    <pre><code>from strands import Agent, tool
+from strands.exceptions import AgentError, ToolError
+
+@tool
+def risky_operation(data: str) -> str:
+    """A tool that might fail."""
+    if not data:
+        raise ToolError("Data cannot be empty")
+    return f"Processed: {data}"
+
+agent = Agent(
+    model="claude-4-sonnet",
+    tools=[risky_operation]
+)
+
+try:
+    response = agent.run("Process this data")
+except AgentError as e:
+    print(f"Agent failed: {e}")
+except ToolError as e:
+    print(f"Tool failed: {e}")
+</code></pre>
+
+                    <h3>Performance Monitoring</h3>
+                    <pre><code>import time
+
+start = time.time()
+response = agent.run("Complex question")
+duration = time.time() - start
+
+print(f"Response time: {duration:.2f}s")
+print(f"Token usage: {agent.last_token_usage}")
+print(f"Tool calls: {agent.last_tool_calls}")
+</code></pre>
+
+                    <h3>Configuration Files</h3>
+                    <pre><code># config.py
+from dataclasses import dataclass
+
+@dataclass
+class AgentConfig:
+    model: str = "claude-4-sonnet"
+    temperature: float = 0.7
+    max_tokens: int = 4096
+    max_iterations: int = 10
+    region: str = "us-east-1"
+
+# Use in your agent
+from strands import Agent
+from config import AgentConfig
+
+config = AgentConfig()
+agent = Agent(
+    model=config.model,
+    temperature=config.temperature,
+    max_tokens=config.max_tokens
+)
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/configuration.html" target="_blank">Configuration Guide</a></li>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/testing.html" target="_blank">Testing Best Practices</a></li>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/debugging.html" target="_blank">Debugging Agents</a></li>
+                    </ul>
+                `
+            }
+        ],
+        quiz: [
+            {
+                question: "How do you install Strands SDK?",
+                options: [
+                    "npm install strands",
+                    "pip install strands-agents",
+                    "brew install strands",
+                    "apt-get install strands"
+                ],
+                correct: 1
+            },
+            {
+                question: "What decorator is used to define agent tools?",
+                options: ["@function", "@tool", "@agent", "@def"],
+                correct: 1
+            },
+            {
+                question: "What is the purpose of type hints in tool definitions?",
+                options: [
+                    "Required by Python",
+                    "Help the LLM understand parameter types",
+                    "Make code faster",
+                    "Only for documentation"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does verbose=True do in Agent configuration?",
+                options: [
+                    "Makes agent talk more",
+                    "Shows agent reasoning and tool calls",
+                    "Increases token limit",
+                    "Enables debugging mode"
+                ],
+                correct: 1
+            }
+        ]
+    },
+    {
+        id: 6,
+        title: "Module 6: Building Your First Agent",
+        priority: "must-know",
+        estimatedHours: 6,
+        description: "Hands-on: Plan, implement, test, and deploy a complete AI agent from scratch.",
+        lessons: [
+            {
+                id: "m6-l1",
+                title: "Planning Your Agent",
+                content: `
+                    <h3>Define Your Agent's Purpose</h3>
+                    <p>Before writing code, answer these questions:</p>
+                    <ul>
+                        <li>What problem does this agent solve?</li>
+                        <li>Who will use it?</li>
+                        <li>What tools does it need?</li>
+                        <li>What are the success criteria?</li>
+                    </ul>
+
+                    <h3>Example: Research Agent</h3>
+                    <pre><code>Purpose: Help users research topics by searching and summarizing
+Users: Product managers, researchers
+Tools Needed:
+  - Web search
+  - Wikipedia search
+  - Document summarization
+Success: Accurate, cited summaries in < 30 seconds
+</code></pre>
+
+                    <h3>Agent Design Template</h3>
+                    <p>Use this template to plan your agent:</p>
+                    <pre><code>1. Agent Name: [descriptive name]
+2. Purpose: [one sentence]
+3. Input: [what user provides]
+4. Output: [what agent returns]
+5. Tools: [list of required tools]
+6. Constraints: [limits, safety requirements]
+7. Error Handling: [how to handle failures]
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/getting-started.html" target="_blank">Getting Started with Strands</a></li>
+                        <li><a href="https://github.com/strands-agents/sdk-python/tree/main/examples" target="_blank">Strands Example Projects</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m6-l2",
+                title: "Implementing Your Agent",
+                content: `
+                    <h3>Step-by-Step Implementation</h3>
+                    <p>Follow this process to build your agent:</p>
+
+                    <h4>1. Set Up Project</h4>
+                    <pre><code>mkdir my-agent && cd my-agent
+python -m venv venv
+source venv/bin/activate
+pip install strands-agents python-dotenv requests
+</code></pre>
+
+                    <h4>2. Create Tools</h4>
+                    <pre><code># tools/search.py
+from strands import tool
+import requests
+
+@tool
+def search_web(query: str) -> str:
+    """Search the web for information."""
+    # Implementation
+    return f"Search results for: {query}"
+</code></pre>
+
+                    <h4>3. Build the Agent</h4>
+                    <pre><code># agent.py
+from strands import Agent
+from tools.search import search_web
+
+agent = Agent(
+    model="claude-4-sonnet",
+    system_prompt="You are a research assistant",
+    tools=[search_web]
+)
+
+if __name__ == "__main__":
+    query = input("What would you like to research? ")
+    response = agent.run(query)
+    print(response)
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://aws.github.io/bedrock-agentcore-starter-toolkit/user-guide/runtime/quickstart.html" target="_blank">AgentCore Quickstart</a></li>
+                    </ul>
+                `
+            }
+        ],
+        quiz: [
+            {
+                question: "What is the first step in building an agent?",
+                options: [
+                    "Write code immediately",
+                    "Define the agent's purpose and requirements",
+                    "Deploy to production",
+                    "Buy AWS credits"
+                ],
+                correct: 1
+            }
+        ]
+    },
+    {
+        id: 7,
+        title: "Module 7: Enterprise Patterns & Best Practices",
+        priority: "nice-to-know",
+        estimatedHours: 3,
+        description: "Learn production best practices for error handling, logging, cost optimization, and security.",
+        lessons: [
+            {
+                id: "m7-l1",
+                title: "Production Best Practices",
+                content: `
+                    <h3>Key Enterprise Considerations</h3>
+                    <ul>
+                        <li><strong>Error Handling</strong>: Graceful degradation and retry logic</li>
+                        <li><strong>Logging</strong>: CloudWatch integration for monitoring</li>
+                        <li><strong>Cost Optimization</strong>: Token management and caching</li>
+                        <li><strong>Security</strong>: IAM roles, VPC endpoints, encryption</li>
+                        <li><strong>Scalability</strong>: Auto-scaling and rate limiting</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/best-practices.html" target="_blank">AgentCore Best Practices</a></li>
+                        <li><a href="https://aws.amazon.com/blogs/machine-learning/strands-agents-sdk-a-technical-deep-dive-into-agent-architectures-and-observability/" target="_blank">Observability Deep Dive</a></li>
+                    </ul>
+                `
+            }
+        ],
+        quiz: []
+    },
+    {
+        id: 8,
+        title: "Module 8: Advanced AgentCore Features",
+        priority: "nice-to-know",
+        estimatedHours: 3,
+        description: "Explore multi-agent systems, custom memory, streaming responses, and advanced guardrails.",
+        lessons: [
+            {
+                id: "m8-l1",
+                title: "Advanced Features Overview",
+                content: `
+                    <h3>Advanced Topics</h3>
+                    <ul>
+                        <li><strong>Multi-Agent Orchestration</strong>: Coordinating multiple specialized agents</li>
+                        <li><strong>Custom Memory</strong>: Building domain-specific memory systems</li>
+                        <li><strong>Streaming Responses</strong>: Real-time token-by-token responses</li>
+                        <li><strong>Advanced Guardrails</strong>: Custom policy enforcement</li>
+                    </ul>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://aws.amazon.com/blogs/opensource/introducing-strands-agents-1-0-production-ready-multi-agent-orchestration-made-simple/" target="_blank">Multi-Agent Orchestration</a></li>
+                        <li><a href="https://strandsagents.com/latest/documentation/docs/advanced.html" target="_blank">Strands Advanced Features</a></li>
+                    </ul>
+                `
+            }
+        ],
+        quiz: []
+    },
+    {
+        id: 9,
+        title: "Module 9: Pre-Bootcamp Capstone Project",
+        priority: "must-know",
+        estimatedHours: 4,
+        description: "Build a complete AI agent as your capstone project to validate your bootcamp readiness.",
+        lessons: [
+            {
+                id: "m9-l1",
+                title: "Capstone Project: Build a Complete Agent",
+                content: `
+                    <h3>Project Goal</h3>
+                    <p>Build a fully functional AI agent that demonstrates your understanding of:</p>
+                    <ul>
+                        <li>Agent creation with Strands SDK</li>
+                        <li>Tool definition and integration</li>
+                        <li>Error handling and testing</li>
+                        <li>Best practices</li>
+                    </ul>
+
+                    <h3>Suggested Projects</h3>
+                    <ol>
+                        <li><strong>Research Assistant</strong>: Searches web, summarizes findings, cites sources</li>
+                        <li><strong>Data Analyst Agent</strong>: Queries APIs, analyzes data, creates reports</li>
+                        <li><strong>DevOps Helper</strong>: Checks system status, suggests fixes, runs diagnostics</li>
+                        <li><strong>Your Own Idea</strong>: Build something relevant to your work!</li>
+                    </ol>
+
+                    <h3>Evaluation Checklist</h3>
+                    <pre><code>✓ Agent has clear purpose
+✓ Uses at least 2 custom tools
+✓ Includes error handling
+✓ Has system prompt
+✓ Tested with multiple scenarios
+✓ Code is well-documented
+✓ Ready to demo at bootcamp!
+</code></pre>
+
+                    <h3>Official Resources</h3>
+                    <ul>
+                        <li><a href="https://github.com/awslabs/amazon-bedrock-agentcore-samples" target="_blank">AgentCore Sample Projects</a></li>
+                        <li><a href="https://github.com/strands-agents/sdk-python/tree/main/examples" target="_blank">Strands SDK Examples</a></li>
+                    </ul>
+                `
+            },
+            {
+                id: "m9-l2",
+                title: "Bootcamp Preparation Checklist",
+                content: `
+                    <h3>Technical Setup ✓</h3>
+                    <ul>
+                        <li>Python 3.9+ installed</li>
+                        <li>AWS CLI configured</li>
+                        <li>Strands SDK installed</li>
+                        <li>Code editor ready (VS Code/Cursor)</li>
+                        <li>Bedrock model access granted</li>
+                    </ul>
+
+                    <h3>Knowledge Checklist ✓</h3>
+                    <ul>
+                        <li>Python decorators (@tool)</li>
+                        <li>Async/await basics</li>
+                        <li>Agent creation with Strands</li>
+                        <li>Tool definition</li>
+                        <li>Understanding of ReAct pattern</li>
+                        <li>AWS IAM basics</li>
+                        <li>AgentCore 7 services overview</li>
+                    </ul>
+
+                    <h3>What to Bring</h3>
+                    <ul>
+                        <li>Laptop with development environment</li>
+                        <li>AWS credentials</li>
+                        <li>Questions and curiosity!</li>
+                        <li>Your capstone project code (to show off!)</li>
+                    </ul>
+
+                    <h3>Day-Of Tips</h3>
+                    <ul>
+                        <li>Arrive early to set up</li>
+                        <li>Test AWS access beforehand</li>
+                        <li>Have your capstone project ready to demo</li>
+                        <li>Network with other attendees</li>
+                        <li>Ask questions - instructors are there to help!</li>
+                    </ul>
+
+                    <p><strong>Target Readiness Score: 75%+</strong></p>
+                    <p>You've got this! See you at the bootcamp! 🚀</p>
+                `
+            }
+        ],
+        quiz: [
+            {
+                question: "What is the minimum recommended readiness score for the bootcamp?",
+                options: ["50%", "60%", "75%", "100%"],
+                correct: 2
+            }
+        ]
     }
 ];
-
-// Note: Modules 3-9 follow the same structure with lessons and quizzes
-// They cover: AWS/Bedrock basics, AgentCore services, Strands SDK,
-// building first agent, enterprise patterns, advanced features, and capstone project
-// For MVP, we'll render these as "coming soon" with curated external resources
 
 // Resources Data
 const RESOURCES = {
