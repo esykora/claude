@@ -37,7 +37,7 @@ class GitHubSync {
             syncBtn.classList.remove('btn-secondary');
             syncBtn.classList.add('btn-primary');
         } else {
-            statusSpan.textContent = 'Login with GitHub';
+            statusSpan.textContent = 'Sync with GitHub';
             syncBtn.classList.add('btn-secondary');
             syncBtn.classList.remove('btn-primary');
         }
